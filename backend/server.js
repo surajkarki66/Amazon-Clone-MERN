@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import connectDb from "./configs/db";
+import authRouter from './routes/auth.route';
 
 // Config .env to ./config/config.env
 dotenv.config({
@@ -26,6 +27,9 @@ app.use(
 );
 
 app.use(morgan("dev"));
+
+// Use routes
+app.use('/api/', authRouter);
 
 const PORT = process.env.PORT;
 

@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 
 // User Schema
-const userScheama = new mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
@@ -36,7 +36,7 @@ const userScheama = new mongoose.Schema(
 );
 
 // Virtual 
-userScheama
+userSchema
   .virtual('password')
   .set(function(password) {
     this._password = password;
@@ -48,7 +48,7 @@ userScheama
   });
 
 // Methods
-userScheama.methods = {
+userSchema.methods = {
   authenticate: function(plainText) {
     return this.encryptPassword(plainText) === this.hashed_password;
   },
