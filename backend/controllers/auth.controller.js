@@ -1,6 +1,9 @@
-import User from '../models/user.model';
-import { validationResult } from 'express-validator';
-import jwt from 'jsonwebtoken';
+import User from "../models/user.model";
+import { validationResult } from "express-validator";
+import jwt from "jsonwebtoken";
+
+import transporter from "../helpers/accountActivationMailer";
+const { errorHandler } = require("../helpers/dbErrorHandling");
 
 exports.registerController = (req, res) => {
   const { name, email, password } = req.body;
@@ -34,8 +37,40 @@ exports.registerController = (req, res) => {
             expiresIn: "5m",
           }
         );
+        let mailOptions = {
+          from: `"Amazon Clone" ${process.env.EMAIL}`,
+          to: email,
+          subject: "Account activation link",
+          body: "Thank you for choosing us !",
+          html: `
+                <h1>Please click the following link to activate your amazon clone account</h1>
+                <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+                <hr />
+                <p>This email may contain sensetive information</p>
+                <p>${process.env.CLIENT_URL}</p>
+                 `,
+        };
+        // Sending email with defined transport object
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            res.status(400).json({
+              success: false,
+              errors: errorHandler(error),
+            });
+          } else {
+            console.log(info.response)
+            res.status(200).json({
+              success: true,
+              message: `Email has been sent to ${email}`,
+            });
+          }
+        });
+      }
+      if (err) {
+        return res.json({
+          errors: errorHandler(err),
+        });
       }
     });
   }
 };
-
