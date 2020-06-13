@@ -30,3 +30,18 @@ exports.validSignIn =  [
     .matches(/\d/)
     .withMessage("password must contain a number"),
 ];
+exports.forgotPasswordValidator = [
+  check("email")
+    .not()
+    .isEmpty()
+    .isEmail()
+    .withMessage("Must be a valid email address"),
+];
+
+exports.resetPasswordValidator = [
+  check("newPassword")
+    .not()
+    .isEmpty()
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least  8 characters long"),
+];
