@@ -8,9 +8,10 @@ const {
   } = require("../helpers/authValidation");
 
 // Load all controllers
-const { registerController } = require( '../controllers/auth.controller');
+const { registerController, activationController } = require( '../controllers/auth.controller');
 
 // Routes 
 router.post("/register",validSignUp, registerController);
+router.post("/activation", activationController);
 
 export default router;

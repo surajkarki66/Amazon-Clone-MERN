@@ -117,7 +117,7 @@ exports.activationController = (req, res) => {
     jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, (err, _) => {
       if (err) {
         return res.status(401).json({
-          errors: "Link is Expired ! Signup again.",
+          errors: err,
         });
       } else {
         const { name, email, password } = jwt.decode(token);
@@ -146,7 +146,7 @@ exports.activationController = (req, res) => {
     });
   } else {
     return res.json({
-      message: "error happening please try again",
+      message: "token is not in the body!",
     });
   }
 };
