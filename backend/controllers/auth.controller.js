@@ -1,8 +1,9 @@
 import User from "../models/user.model";
 import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
+import mailgun from "mailgun-js";
 
-import transporter from "../helpers/accountActivationMailer";
+//import transporter from "../helpers/accountActivationMailer";
 const { errorHandler } = require("../helpers/dbErrorHandling");
 
 exports.registerController = (req, res) => {
@@ -37,6 +38,39 @@ exports.registerController = (req, res) => {
             expiresIn: "5m",
           }
         );
+        // Using Mailgun
+        const mg = mailgun({
+          apiKey: process.env.MAILGUN_API_KEY,
+          domain: process.env.DOMAIN,
+        });
+        const data = {
+          from: `"Amazon Clone" ${process.env.EMAIL}`,
+          to: email,
+          subject: "Account activation link",
+          body: "Thank you for choosing us !",
+          html: `
+                <h1>Please click the following link to activate your amazon clone account</h1>
+                <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+                <hr />
+                <p>This email may contain sensetive information</p>
+                <p>${process.env.CLIENT_URL}</p>
+                 `,
+        };
+        mg.messages().send(data, (error, body) => {
+          if (error) {
+            res.status(400).json({
+              success: false,
+              errors: errorHandler(error),
+            });
+          } else {
+            res.status(200).json({
+              success: true,
+              message: `Email has been sent to ${email}`,
+            });
+          }
+        });
+        // Using node mailer.
+        /*
         let mailOptions = {
           from: `"Amazon Clone" ${process.env.EMAIL}`,
           to: email,
@@ -65,6 +99,7 @@ exports.registerController = (req, res) => {
             });
           }
         });
+        */
       }
       if (err) {
         return res.json({
