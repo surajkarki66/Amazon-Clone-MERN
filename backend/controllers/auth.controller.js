@@ -109,3 +109,44 @@ exports.registerController = (req, res) => {
     });
   }
 };
+
+exports.activationController = (req, res) => {
+  const { token } = req.body;
+
+  if (token) {
+    jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, (err, _) => {
+      if (err) {
+        return res.status(401).json({
+          errors: "Link is Expired ! Signup again.",
+        });
+      } else {
+        const { name, email, password } = jwt.decode(token);
+
+        const user = new User({
+          name,
+          email,
+          password
+        });
+
+        user.save((err, user) => {
+          if (err) {
+            return res.status(401).json({
+              success: false,
+              errors: errorHandler(err)
+            });
+          } else {
+            return res.json({
+              success: true,
+              user: user,
+              message: "Successfully Signed Up!"
+            });
+          }
+        });
+      }
+    });
+  } else {
+    return res.json({
+      message: "error happening please try again",
+    });
+  }
+};
