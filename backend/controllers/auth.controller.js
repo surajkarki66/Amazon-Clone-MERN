@@ -125,20 +125,20 @@ exports.activationController = (req, res) => {
         const user = new User({
           name,
           email,
-          password
+          password,
         });
 
         user.save((err, user) => {
           if (err) {
             return res.status(401).json({
               success: false,
-              errors: errorHandler(err)
+              errors: errorHandler(err),
             });
           } else {
             return res.json({
               success: true,
               user: user,
-              message: "Successfully Signed Up!"
+              message: "Successfully Signed Up!",
             });
           }
         });
@@ -147,6 +147,63 @@ exports.activationController = (req, res) => {
   } else {
     return res.json({
       message: "token is not in the body!",
+    });
+  }
+};
+
+exports.signinController = (req, res) => {
+  const { email, password } = req.body;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const firstError = errors.array().map((error) => error.msg)[0];
+    return res.status(422).json({
+      errors: firstError,
+    });
+  } else {
+    // Checking the existence of the user.
+    User.findOne({
+      email
+    }).exec((err, user) => {
+      if (!user) {
+        return res.status(400).json({
+          errors: "User with that email does not exist. Please signup",
+        });
+      }
+      if (err) {
+        return res.json({
+          error: "Something went wrong with database.",
+        });
+      }
+      if (user) {
+        // Checks users password
+        if (!user.authenticate(password)) {
+          return res.status(400).json({
+            errors: "Email and password do not match",
+          });
+        } else {
+          // Generate a token and send to client
+          const token = jwt.sign(
+            {
+              _id: user._id,
+            },
+            process.env.JWT_SECRET,
+            {
+              expiresIn: "7d",
+            }
+          );
+          const { _id, name, email, role } = user;
+
+          return res.json({
+            token,
+            user: {
+              _id,
+              name,
+              email,
+              role,
+            },
+          });
+        }
+      }
     });
   }
 };
