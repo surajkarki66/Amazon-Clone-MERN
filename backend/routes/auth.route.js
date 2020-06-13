@@ -4,7 +4,8 @@ const router = express.Router();
 
 // Load validator
 const {
-    validSignUp
+    validSignUp,
+    validSignIn
   } = require("../helpers/authValidation");
 
 // Load all controllers
@@ -13,6 +14,6 @@ const { registerController, activationController, signinController } = require( 
 // Routes 
 router.post("/register",validSignUp, registerController);
 router.post("/activation", activationController);
-router.post("/signin", signinController);
+router.post("/signin",validSignIn, signinController);
 
 export default router;

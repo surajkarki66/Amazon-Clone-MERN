@@ -18,3 +18,15 @@ exports.validSignUp = [
     .matches(/\d/)
     .withMessage("password must contain a number"),
 ];
+
+exports.validSignIn =  [
+  check("email").isEmail().withMessage("Must be a valid email address"),
+  check("password", "password is required").notEmpty(),
+  check("password")
+    .isLength({
+      min: 8,
+    })
+    .withMessage("Password must contain at least 8 characters")
+    .matches(/\d/)
+    .withMessage("password must contain a number"),
+];
