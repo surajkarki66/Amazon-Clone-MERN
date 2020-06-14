@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import mailgun from "mailgun-js";
 import expressJwt from "express-jwt";
 import dotenv from "dotenv";
-import _ from 'lodash';
+import _ from "lodash";
 
 // Config .env to ./config/config.env
 dotenv.config({
@@ -26,95 +26,98 @@ exports.registerController = (req, res) => {
   } else {
     User.findOne({
       email,
-    }).exec((err, user) => {
-      // Checking the existence of the user.
-      if (user) {
-        return res.status(400).json({
-          errors: "Email is taken",
-        });
-      }
-      if (!user && !err) {
-        // Converting payload to jsonwebtoken.
-        const token = jwt.sign(
-          {
-            name,
-            email,
-            password,
-          },
-          process.env.JWT_ACCOUNT_ACTIVATION,
-          {
-            expiresIn: "5m",
-          }
-        );
-        // Using Mailgun
-        const mg = mailgun({
-          apiKey: process.env.MAILGUN_API_KEY,
-          domain: process.env.DOMAIN,
-        });
-        const data = {
-          from: `"Amazon Clone" ${process.env.EMAIL}`,
-          to: email,
-          subject: "Account activation link",
-          body: "Thank you for choosing us !",
-          html: `
-                <h1>Please click the following link to activate your amazon clone account</h1>
-                <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
-                <hr />
-                <p>This email may contain sensetive information</p>
-                <p>${process.env.CLIENT_URL}</p>
-                 `,
-        };
-        mg.messages().send(data, (error, body) => {
-          if (error) {
-            res.status(400).json({
-              success: false,
-              errors: errorHandler(error),
+    })
+      .then((user) => {
+        if (user) {
+          return res.status(400).json({
+            error: "Email is taken",
+          });
+        } else {
+          // Converting payload to jsonwebtoken.
+          const token = jwt.sign(
+            {
+              name,
+              email,
+              password,
+            },
+            process.env.JWT_ACCOUNT_ACTIVATION,
+            {
+              expiresIn: "5m",
+            }
+          );
+          // Using Mailgun
+          const mg = mailgun({
+            apiKey: process.env.MAILGUN_API_KEY,
+            domain: process.env.DOMAIN,
+          });
+          const data = {
+            from: `"Amazon Clone" ${process.env.EMAIL}`,
+            to: email,
+            subject: "Account activation link",
+            body: "Thank you for choosing us !",
+            html: `
+                    <h1>Please click the following link to activate your amazon clone account</h1>
+                    <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+                    <hr />
+                    <p>This email may contain sensetive information</p>
+                    <p>${process.env.CLIENT_URL}</p>
+                     `,
+          };
+          mg.messages().send(data, (error, body) => {
+            if (body) {
+              res.status(200).json({
+                success: true,
+                message: `Email has been sent to ${email}`,
+              });
+            }
+            if (error) {
+              res.status(400).json({
+                success: false,
+                errors: "Something went wrong with mailgun !",
+              });
+            }
+          });
+
+          // Using node mailer.
+          /*
+            let mailOptions = {
+              from: `"Amazon Clone" ${process.env.EMAIL}`,
+              to: email,
+              subject: "Account activation link",
+              body: "Thank you for choosing us !",
+              html: `
+                    <h1>Please click the following link to activate your amazon clone account</h1>
+                    <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
+                    <hr />
+                    <p>This email may contain sensetive information</p>
+                    <p>${process.env.CLIENT_URL}</p>
+                     `,
+            };
+            // Sending email with defined transport object
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                res.status(400).json({
+                  success: false,
+                  errors: errorHandler(error),
+                });
+              } else {
+                console.log(info.response)
+                res.status(200).json({
+                  success: true,
+                  message: `Email has been sent to ${email}`,
+                });
+              }
             });
-          } else {
-            res.status(200).json({
-              success: true,
-              message: `Email has been sent to ${email}`,
-            });
-          }
-        });
-        // Using node mailer.
-        /*
-        let mailOptions = {
-          from: `"Amazon Clone" ${process.env.EMAIL}`,
-          to: email,
-          subject: "Account activation link",
-          body: "Thank you for choosing us !",
-          html: `
-                <h1>Please click the following link to activate your amazon clone account</h1>
-                <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
-                <hr />
-                <p>This email may contain sensetive information</p>
-                <p>${process.env.CLIENT_URL}</p>
-                 `,
-        };
-        // Sending email with defined transport object
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            res.status(400).json({
-              success: false,
-              errors: errorHandler(error),
-            });
-          } else {
-            console.log(info.response)
-            res.status(200).json({
-              success: true,
-              message: `Email has been sent to ${email}`,
-            });
-          }
-        });
-        */
-      }
-      if (err) {
-        return res.json({
-          errors: errorHandler(err),
-        });
-      }
-    });
+            */
+        }
+      })
+      .catch((error) => {
+        if (error) {
+          return res.json({
+            error: errorHandler(err),
+          });
+        }
+      });
   }
 };
 
@@ -125,7 +128,7 @@ exports.activationController = (req, res) => {
     jwt.verify(token, process.env.JWT_ACCOUNT_ACTIVATION, (err, _) => {
       if (err) {
         return res.status(401).json({
-          errors: err,
+          error: err,
         });
       } else {
         const { name, email, password } = jwt.decode(token);
@@ -136,20 +139,23 @@ exports.activationController = (req, res) => {
           password,
         });
 
-        user.save((err, user) => {
-          if (err) {
+        user
+          .save()
+          .then((user) => {
+            if (user) {
+              return res.json({
+                success: true,
+                user: user,
+                message: "Successfully Signed Up!",
+              });
+            }
+          })
+          .catch((err) => {
             return res.status(401).json({
               success: false,
-              errors: errorHandler(err),
+              error: errorHandler(err),
             });
-          } else {
-            return res.json({
-              success: true,
-              user: user,
-              message: "Successfully Signed Up!",
-            });
-          }
-        });
+          });
       }
     });
   } else {
@@ -175,48 +181,49 @@ exports.signinController = (req, res) => {
     // Checking the existence of the user.
     User.findOne({
       email,
-    }).exec((err, user) => {
-      if (!user) {
-        return res.status(400).json({
-          errors: "User with that email does not exist. Please signup",
-        });
-      }
-      if (err) {
+    })
+      .then((user) => {
+        if (!user) {
+          return res.status(400).json({
+            errors: "User with that email does not exist. Please signup",
+          });
+        }
+        if (user) {
+          // Checks users password
+          if (!user.authenticate(password)) {
+            return res.status(400).json({
+              errors: "Email and password do not match",
+            });
+          } else {
+            // Generate a token and send to client
+            const token = jwt.sign(
+              {
+                _id: user._id,
+              },
+              process.env.JWT_SECRET,
+              {
+                expiresIn: "7d",
+              }
+            );
+            const { _id, name, email, role } = user;
+
+            return res.json({
+              token,
+              user: {
+                _id,
+                name,
+                email,
+                role,
+              },
+            });
+          }
+        }
+      })
+      .catch((err) => {
         return res.json({
           error: "Something went wrong with database.",
         });
-      }
-      if (user) {
-        // Checks users password
-        if (!user.authenticate(password)) {
-          return res.status(400).json({
-            errors: "Email and password do not match",
-          });
-        } else {
-          // Generate a token and send to client
-          const token = jwt.sign(
-            {
-              _id: user._id,
-            },
-            process.env.JWT_SECRET,
-            {
-              expiresIn: "7d",
-            }
-          );
-          const { _id, name, email, role } = user;
-
-          return res.json({
-            token,
-            user: {
-              _id,
-              name,
-              email,
-              role,
-            },
-          });
-        }
-      }
-    });
+      });
   }
 };
 
@@ -230,81 +237,76 @@ exports.forgotPasswordController = (req, res) => {
       errors: firstError,
     });
   } else {
-    User.findOne(
-      {
-        email,
-      },
-      (err, user) => {
+    User.findOne({ email })
+      .then((user) => {
         if (!user) {
           return res.status(400).json({
             error: "User with that email does not exist",
           });
         }
-        if (err) {
-          return res.json({
-            error: "Something wrong with database !",
+        if (user) {
+          const token = jwt.sign(
+            {
+              _id: user._id,
+            },
+            process.env.JWT_RESET_PASSWORD,
+            {
+              expiresIn: "10m",
+            }
+          );
+          // Using Mailgun
+          const mg = mailgun({
+            apiKey: process.env.MAILGUN_API_KEY,
+            domain: process.env.DOMAIN,
           });
-        }
-
-        const token = jwt.sign(
-          {
-            _id: user._id,
-          },
-          process.env.JWT_RESET_PASSWORD,
-          {
-            expiresIn: "10m",
-          }
-        );
-
-        // Using Mailgun
-        const mg = mailgun({
-          apiKey: process.env.MAILGUN_API_KEY,
-          domain: process.env.DOMAIN,
-        });
-        const data = {
-          from: `"Amazon Clone" ${process.env.EMAIL}`,
-          to: email,
-          subject: "Password Reset Link !",
-          body: "Thank you for choosing us !",
-          html: `
+          const data = {
+            from: `"Amazon Clone" ${process.env.EMAIL}`,
+            to: email,
+            subject: "Password Reset Link !",
+            body: "Thank you for choosing us !",
+            html: `
                 <h1>Please click the following link to reset your password !</h1>
                 <p>${process.env.CLIENT_URL}/users/activate/${token}</p>
                 <hr />
                 <p>This email may contain sensetive information</p>
                 <p>${process.env.CLIENT_URL}</p>
                  `,
-        };
-
-        return user.updateOne(
-          {
-            resetPasswordLink: token,
-          },
-          (err, success) => {
-            if (err) {
-              return res.status(400).json({
-                error:
-                  "Database connection error on user password forgot request",
-              });
-            } else {
-              mg.messages().send(data, (error, body) => {
-                if (body) {
-                  res.status(200).json({
-                    success: true,
-                    message: `Email has been sent to ${email}. Follow the instruction to reset your password !`,
-                  });
-                }
-                if (error) {
-                  res.status(400).json({
-                    success: false,
-                    errors: errorHandler(error),
-                  });
-                }
-              });
-            }
-          }
-        );
-      }
-    );
+          };
+          return user
+            .updateOne({ resetPasswordLink: token })
+            .then((success) => {
+              if (success) {
+                mg.messages().send(data, (error, body) => {
+                  if (body) {
+                    res.status(200).json({
+                      success: true,
+                      message: `Email has been sent to ${email}. Follow the instruction to reset your password !`,
+                    });
+                  }
+                  if (error) {
+                    res.status(400).json({
+                      success: false,
+                      errors: errorHandler(error),
+                    });
+                  }
+                });
+              }
+            })
+            .catch((error) => {
+              if (error) {
+                return res.status(400).json({
+                  error:
+                    "Database connection error on user password forgot request",
+                });
+              }
+            });
+        }
+      })
+      .catch((error) => {
+        return res.json({
+          error: "Something wrong with database !",
+        });
+      });
   }
 };
 
@@ -330,12 +332,11 @@ exports.resetPasswordController = (req, res) => {
         }
 
         if (decoded) {
-          User.findOne(
-            {
-              resetPasswordLink,
-            },
-            (err, user) => {
-              if (err || !user) {
+          User.findOne({
+            resetPasswordLink,
+          })
+            .then((user) => {
+              if (!user) {
                 return res.status(400).json({
                   error: "Something went wrong. Try later",
                 });
@@ -345,24 +346,28 @@ exports.resetPasswordController = (req, res) => {
                   password: newPassword,
                   resetPasswordLink: "",
                 };
-
                 user = _.extend(user, updatedFields);
-
-                user.save((err, result) => {
-                  if (err) {
+                user
+                  .save()
+                  .then((result) => {
+                    if (result) {
+                      return res.json({
+                        message: `Great! Now you can login with your new password`,
+                      });
+                    }
+                  })
+                  .catch((error) => {
                     return res.status(400).json({
-                      error: "Error resetting user password",
+                      error: "Error reseting user password",
                     });
-                  }
-                  if (result) {
-                    res.json({
-                      message: `Great! Now you can login with your new password`,
-                    });
-                  }
-                });
+                  });
               }
-            }
-          );
+            })
+            .catch((error) => {
+              return res.status(400).json({
+                error: "Something went wrong with database !",
+              });
+            });
         }
       });
     }
