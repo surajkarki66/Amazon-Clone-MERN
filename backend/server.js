@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 import connectDb from "./configs/db";
 import authRouter from './routes/auth.route';
+import productRouter from './routes/product.route';
 
 // Config .env to ./config/config.env
 dotenv.config({
@@ -30,6 +31,7 @@ app.use(morgan("dev"));
 
 // Use routes
 app.use('/api/', authRouter);
+app.use('/api/products', productRouter);
 
 const PORT = process.env.PORT;
 
