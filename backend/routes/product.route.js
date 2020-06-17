@@ -8,10 +8,12 @@ import productListController from "../controllers/products/productList.controlle
 import createProductController from "../controllers/products/createProduct.controller";
 import updateProductController from "../controllers/products/updateProduct.controller";
 import deleteProductController from "../controllers/products/deleteProduct.controller";
+import productDetailController from "../controllers/products/productDetail.controller";
 
 // Routes
 router.get("/", productListController);
 router.post("/", isAuth, isAdmin, createProductController);
+router.get("/:id", productDetailController);
 router.put("/:id", isAuth, isAdmin, updateProductController);
 router.delete("/:id", isAuth, isAdmin, deleteProductController);
 
