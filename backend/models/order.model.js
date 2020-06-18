@@ -7,11 +7,10 @@ const shippingSchema = {
   country: { type: String, required: true },
 };
 
-/*
 const paymentSchema = {
-    paymentMethod: { type: String, required: true }
-  };
-*/
+  paymentMethod: { type: String, required: true },
+};
+
 const orderItemSchema = new mongoose.Schema({
   name: { type: String, required: true },
   qty: { type: Number, required: true },
@@ -29,7 +28,7 @@ const orderSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     orderItems: [orderItemSchema],
     shipping: shippingSchema,
-    //payment: paymentSchema,
+    payment: paymentSchema,
     itemsPrice: { type: Number },
     taxPrice: { type: Number },
     shippingPrice: { type: Number },
@@ -43,5 +42,6 @@ const orderSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
 const orderModel = mongoose.model("Order", orderSchema);
 export default orderModel;
