@@ -27,6 +27,11 @@ const Activate = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(activation(token));
+    setFormData({
+      ...formData,
+      name: "",
+      token: ""
+    });
   };
 
   return (

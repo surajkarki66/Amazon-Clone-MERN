@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import Cookie from "js-cookie";
 const RegisterScreen = (props) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -52,6 +52,12 @@ const RegisterScreen = (props) => {
       }
     }
   };
+  useEffect(() => {
+    const userInfo = Cookie.getJSON("userInfo") || null;
+    if (userInfo) {
+      props.history.push("/shipping");
+    }
+  }, []);
   let form = (
     <form onSubmit={submitHandler}>
       <ul className="form-container">
