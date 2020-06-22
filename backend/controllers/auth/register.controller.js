@@ -19,7 +19,7 @@ const registerController = (req, res) => {
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
     return res.status(422).json({
-      errors: firstError,
+      error: firstError,
     });
   } else {
     User.findOne({
@@ -43,6 +43,12 @@ const registerController = (req, res) => {
               expiresIn: "5m",
             }
           );
+
+          res.json({
+            message: "Activation Link SuccessFully Sent",
+            activationLink: `${process.env.CLIENT_URL}/user/activate/${token}`,
+          });
+          /*
           // Using Mailgun
           const mg = mailgun({
             apiKey: process.env.MAILGUN_API_KEY,
@@ -65,16 +71,17 @@ const registerController = (req, res) => {
             if (body) {
               res.status(200).json({
                 success: true,
-                message: `Email has been sent to ${email}`,
+                message: `Email has been sent to ${email} to activate your account`,
               });
             }
             if (error) {
               res.status(400).json({
                 success: false,
-                errors: "Something went wrong with mailgun !",
+                error: "Something went wrong with mailgun !",
               });
             }
           });
+          */
 
           // Using node mailer.
           /*
@@ -96,7 +103,7 @@ const registerController = (req, res) => {
                 if (error) {
                   res.status(400).json({
                     success: false,
-                    errors: errorHandler(error),
+                    error: errorHandler(error),
                   });
                 } else {
                   console.log(info.response)

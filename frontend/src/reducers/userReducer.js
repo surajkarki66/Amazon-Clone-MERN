@@ -1,4 +1,11 @@
-import { USER_SIGNIN_REQUEST, USER_SIGNIN_SUCCESS, USER_SIGNIN_FAIL } from "../constants/userConstants";
+import {
+  USER_SIGNIN_REQUEST,
+  USER_SIGNIN_SUCCESS,
+  USER_SIGNIN_FAIL,
+  USER_ACTIVATION_REQUEST,
+  USER_ACTIVATION_SUCCESS,
+  USER_ACTIVATION_FAIL
+} from "../constants/userConstants";
 
 const userSigninReducer = (state = {}, action) => {
   switch (action.type) {
@@ -8,8 +15,23 @@ const userSigninReducer = (state = {}, action) => {
       return { loading: false, userInfo: action.payload };
     case USER_SIGNIN_FAIL:
       return { loading: false, error: action.payload };
-    default: return state;
+    default:
+      return state;
+  }
+};
+
+
+const userActivationReducer = (state = {}, action) => {
+  switch (action.type) {
+    case USER_ACTIVATION_REQUEST:
+      return { loading: true };
+    case USER_ACTIVATION_SUCCESS:
+      return { loading: false, data: action.payload };
+    case USER_ACTIVATION_FAIL:
+      return { loading: false, error: action.payload };
+    default:
+      return state;
   }
 }
 
-export { userSigninReducer };
+export { userSigninReducer, userActivationReducer };

@@ -33,7 +33,7 @@ const activationController = (req, res) => {
               return res.json({
                 success: true,
                 user: user,
-                message: "Successfully Signed Up!",
+                message: "Your account is succesfully activated..",
               });
             }
           })

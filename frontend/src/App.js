@@ -2,11 +2,15 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter, Route, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css'; 
 
 import HomeScreen from './screens/HomeScreen';
 import ProductScreen from './screens/ProductScreen';
 import CartScreen from './screens/CartScreen';
 import SignInScreen from './screens/SignInScreen';
+import RegisterScreen from './screens/RegisterScreen';
+import ActivationScreen from './screens/ActivateScreen';
 
 
 function App() {
@@ -22,6 +26,7 @@ function App() {
   return (
     <BrowserRouter>
     <div className="grid-container">
+    <ToastContainer />
     <header className="header">
       <div className="brand">
         <button onClick={openMenu}>
@@ -56,6 +61,8 @@ function App() {
       <Route path="/product/:id" component={ProductScreen} />
       <Route path="/cart/:id?" component={CartScreen} />
       <Route path="/signin" component={SignInScreen} />
+      <Route path="/register" component={RegisterScreen} />
+      <Route path="/user/activate/:token" component={ActivationScreen} />
       <Route path="/" exact={true} component={HomeScreen} />
 
       </div>
