@@ -13,7 +13,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import ActivationScreen from './screens/ActivateScreen';
 import ShippingScreen from './screens/ShippingScreen';
 import PaymentScreen from './screens/PaymentScreen';
-
+import PlaceOrderScreen from './screens/PlaceOrderScreen';
 
 function App() {
   const userSignin = useSelector(state => state.userSignin);
@@ -67,7 +67,7 @@ function App() {
       <Route path="/user/activate/:token" component={ActivationScreen} />
       <Route path="/shipping" component={ShippingScreen} />
       <Route path="/payment" component={PaymentScreen} />
-      {/*<Route path="/placeorder" component={PlaceOrderScreen} /> */}
+      <Route path="/placeorder" component={PlaceOrderScreen} /> 
       <Route path="/" exact={true} component={HomeScreen} />
 
       </div>
