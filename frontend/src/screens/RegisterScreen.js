@@ -57,7 +57,7 @@ const RegisterScreen = (props) => {
     if (userInfo) {
       props.history.push("/shipping");
     }
-  }, []);
+  }, [props.history]);
   let form = (
     <form onSubmit={submitHandler}>
       <ul className="form-container">

@@ -7,7 +7,11 @@ import {
   USER_SIGNIN_FAIL,
   USER_ACTIVATION_REQUEST,
   USER_ACTIVATION_SUCCESS,
-  USER_ACTIVATION_FAIL
+  USER_ACTIVATION_FAIL,
+  USER_LOGOUT,
+  PROFILE_UPDATE_REQUEST,
+  PROFILE_UPDATE_SUCCESS,
+  PROFILE_UPDATE_FAIL
 } from "../constants/userConstants";
 
 const signin = (email, password) => async (dispatch) => {
@@ -20,7 +24,7 @@ const signin = (email, password) => async (dispatch) => {
     dispatch({ type: USER_SIGNIN_SUCCESS, payload: response.data });
     Cookie.set("userInfo", JSON.stringify(response.data));
   } catch (error) {
-    dispatch({ type: USER_SIGNIN_FAIL, payload: error.response.data.errors });
+    dispatch({ type: USER_SIGNIN_FAIL, payload: error });
   }
 };
 
@@ -34,4 +38,28 @@ const activation = (token) => async(dispatch) => {
   }
 };
 
-export { signin, activation };
+const logout = () => (dispatch) => {
+  Cookie.remove("userInfo");
+  dispatch({ type: USER_LOGOUT })
+};
+
+const update = ({ userId, name, email, password }) => async (dispatch, getState) => {
+  const { userSignin: { userInfo } } = getState();
+  dispatch({ type: PROFILE_UPDATE_REQUEST, payload: { userId, name, email, password } });
+  try {
+    const { data } = await axios.post("http://localhost:5000/api/user/" + userId,
+      { name, email, password }, {
+      headers: {
+        Authorization: 'Bearer ' + userInfo.token
+      }
+    });
+    dispatch({ type: PROFILE_UPDATE_SUCCESS, payload: data });
+
+  } catch (error) {
+    dispatch({ type: PROFILE_UPDATE_FAIL, payload: error});
+   
+  }
+};
+
+
+export { signin, activation, logout, update };

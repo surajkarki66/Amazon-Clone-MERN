@@ -4,7 +4,10 @@ import {
   USER_SIGNIN_FAIL,
   USER_ACTIVATION_REQUEST,
   USER_ACTIVATION_SUCCESS,
-  USER_ACTIVATION_FAIL
+  USER_ACTIVATION_FAIL,
+  PROFILE_UPDATE_REQUEST,
+  PROFILE_UPDATE_SUCCESS,
+  PROFILE_UPDATE_FAIL
 } from "../constants/userConstants";
 
 const userSigninReducer = (state = {}, action) => {
@@ -32,6 +35,19 @@ const userActivationReducer = (state = {}, action) => {
     default:
       return state;
   }
-}
+};
 
-export { userSigninReducer, userActivationReducer };
+const profileUpdateReducer = (state = {}, action) => {
+  switch (action.type) {
+    case PROFILE_UPDATE_REQUEST:
+      return { loading: true };
+    case PROFILE_UPDATE_SUCCESS:
+      return { loading: false, data: action.payload};
+    case PROFILE_UPDATE_FAIL:
+      return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
+
+export { userSigninReducer, userActivationReducer, profileUpdateReducer };

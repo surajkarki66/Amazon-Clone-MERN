@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 
 import {signin} from '../actions/userActions';
 
@@ -14,10 +15,13 @@ const SignInScreen = (props) => {
       if (userInfo) {
         props.history.push(redirect);
       }
+      if (error) {
+        toast.error(error.response.data.error);
+      }
       return () => {
         //
       };
-    }, [userInfo, props.history, redirect]);
+    }, [userInfo, props.history, redirect, error]);
   
     const dispatch = useDispatch();
 
@@ -33,7 +37,6 @@ const SignInScreen = (props) => {
         </li>
         <li>
           {loading && <div>Loading...</div>}
-          {error && <div>{error}</div>}
         </li>
         <li>
           <label htmlFor="email">

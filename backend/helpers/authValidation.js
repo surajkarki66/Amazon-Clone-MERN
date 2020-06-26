@@ -1,13 +1,20 @@
 import { check } from 'express-validator';
 
 exports.validSignUp = [
-  check("name", "Name is required")
+  check("firstName", "First Name is required")
     .notEmpty()
     .isLength({
       min: 4,
       max: 32,
     })
-    .withMessage("name must be between 3 to 32 characters"),
+    .withMessage("First Name must be between 3 to 32 characters"),
+  check("lastName", "Last Name is required")
+  .notEmpty()
+  .isLength({
+    min: 4,
+    max: 32,
+  })
+  .withMessage("Last Name must be between 3 to 32 characters"),
   check("email").isEmail().withMessage("Must be a valid email address"),
   check("password", "password is required").notEmpty(),
   check("password")

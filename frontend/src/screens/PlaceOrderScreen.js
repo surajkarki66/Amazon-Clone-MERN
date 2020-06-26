@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { Cookie } from 'js-cookie';
 
 
 import CheckoutSteps from '../components/CheckoutSteps';
@@ -29,8 +30,9 @@ const dispatch = useDispatch();
       taxPrice, totalPrice
     }));
   };
+
   useEffect(() => {
-    if ((Object.entries(shipping).length==0) && (Object.entries(payment).length==0)) {
+    if ((Object.entries(shipping).length===0) && (Object.entries(payment).length===0)) {
       props.history.push('/shipping');
     }
     if (success) {
@@ -40,8 +42,8 @@ const dispatch = useDispatch();
     if (error) {
       toast.error(error);
     }
-
-  }, [success, props.history]);
+     // eslint-disable-next-line
+  }, [success, props.history, error, payment, shipping, ]);
 
   return <div>
     <CheckoutSteps step1 step2 step3 step4 ></CheckoutSteps>

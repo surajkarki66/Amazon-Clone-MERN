@@ -199,8 +199,11 @@ a:hover{
 .button.primary{
   background-color: #f0c040;
 }
-.button.secondary{
+.button.secondary.logout{
+  margin-top: 10px;
+  border: .1rem red solid;
   background-color: #f0f0f0;
+  padding: none;
 }
 .text-center{
   text-align: center;

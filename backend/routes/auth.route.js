@@ -2,11 +2,17 @@ import express from "express";
 
 const router = express.Router();
 
-import registerController from "../controllers/auth/register.controller";
-import activationController from "../controllers/auth/activation.controller";
-import signinController from "../controllers/auth/signin.controller";
-import forgetPasswordController from "../controllers/auth/forgetPassword.controller"
-import resetPasswordController from "../controllers/auth/resetPassword.controller";
+import {
+  registerController,
+  activationController,
+  signinController,
+  forgetPasswordController,
+  resetPasswordController,
+  facebookController,
+  profileChangeController,
+  profileUpdationConfirmController
+} from '../controllers/auth/auth.controller';
+
 
 // Load validator
 const {
@@ -18,9 +24,12 @@ const {
 
 // Routes
 router.post("/register", validSignUp, registerController);
-router.post("/activation", activationController);
+router.patch("/activation", activationController);
 router.post("/signin", validSignIn, signinController);
-router.put("/forget", forgotPasswordValidator, forgetPasswordController);
+router.post("/forget", forgotPasswordValidator, forgetPasswordController);
 router.put("/reset", resetPasswordValidator, resetPasswordController);
+router.post('/user/:id', profileChangeController);
+router.put('/profile/confirm', profileUpdationConfirmController);
+
 
 export default router;
