@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { toast } from "react-toastify";
 
+
+import LoadingIndicator from '../components/UI/LoadingIndicator';
 import { listOrders, deleteOrder } from "../actions/orderActions";
 
 const OrdersScreen = (props) => {
@@ -19,28 +20,17 @@ const OrdersScreen = (props) => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    if (userSignin.userInfo !== null) {
-      const isAdmin = userSignin.userInfo.role === "admin";
-      if (isAdmin) {
-        if (successDelete) {
-          window.location.reload(false);
-        }
-        if (errorDelete) {
-          toast.error("Something went wrong !");
-          dispatch(listOrders());
-        } else {
-          dispatch(listOrders());
-        }
-      } else {
-        props.history.push("/");
-      }
-    } else {
-      props.history.push("/");
-    }
+    dispatch(listOrders());
     return () => {
       //
     };
-  }, [successDelete, dispatch, errorDelete, props.history, userSignin.userInfo]);
+  }, [
+    successDelete,
+    dispatch,
+    errorDelete,
+    props.history,
+    userSignin.userInfo,
+  ]);
 
   const deleteHandler = (order) => {
     dispatch(deleteOrder(order._id));
@@ -48,7 +38,7 @@ const OrdersScreen = (props) => {
 
   let allOrders = null;
   if (loading) {
-    allOrders = <div>Loading ...</div>;
+    allOrders = <h1 style={{textAlign:'center'}}><LoadingIndicator /></h1>;
   }
   if (error) {
     allOrders = <div>{error}</div>;
@@ -67,7 +57,9 @@ const OrdersScreen = (props) => {
                   <th>ID</th>
                   <th>DATE</th>
                   <th>TOTAL</th>
-                  <th>USER</th>
+                  <th>FIRST NAME</th>
+                  <th>LAST NAME</th>
+                  <th>EMAIL</th>
                   <th>PAID</th>
                   <th>PAID AT</th>
                   <th>DELIVERED</th>
@@ -79,9 +71,11 @@ const OrdersScreen = (props) => {
                 {orders.map((order) => (
                   <tr key={order._id}>
                     <td>{order._id}</td>
-                    <td>{order.createdAt}</td>
+                    <td>{order.createdAt.substring(0, 10)}</td>
                     <td>{order.totalPrice}</td>
-                    <td>{order.user.name}</td>
+                    <td>{order.user.firstName}</td>
+                    <td>{order.user.lastName}</td>
+                    <td>{order.user.email}</td>
                     <td>{order.isPaid.toString()}</td>
                     <td>{order.paidAt}</td>
                     <td>{order.isDelivered.toString()}</td>

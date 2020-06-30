@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import { detailsProduct } from "../actions/productActions";
+import LoadingIndicator from '../components/UI/LoadingIndicator';
 
 const ProductScreen = (props) => {
   const [qty, setQty] = useState(1);
@@ -21,7 +22,7 @@ const ProductScreen = (props) => {
   const { product, loading, error } = productDetails;
   let detail = null;
   if (loading) {
-    detail = <div> Loading...</div>;
+    detail = <h1 style={{textAlign:'center'}}><LoadingIndicator /></h1>;;
   }
   if (error) {
     detail = <div>{error}</div>;
@@ -30,7 +31,7 @@ const ProductScreen = (props) => {
     detail = (
       <div className="details">
         <div className="details-image">
-          <img src={product.image} alt="product"></img>
+          <img src={"http://localhost:5000/" + product.image} alt="product"></img>
         </div>
         <div className="details-info">
           <ul>

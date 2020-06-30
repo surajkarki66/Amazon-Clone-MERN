@@ -3,16 +3,20 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Cookie from "js-cookie";
+
+import LoadingIndicator from '../components/UI/LoadingIndicator';
+
 const RegisterScreen = (props) => {
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     rePassword: "",
   });
   const [newStage, setNewStage] = useState(false);
 
-  const { name, email, password, rePassword } = formData;
+  const { firstName, lastName, email, password, rePassword } = formData;
 
   const [loading, setLoading] = useState(false);
 
@@ -31,12 +35,14 @@ const RegisterScreen = (props) => {
     if (password === rePassword) {
       try {
         setLoading(true);
-        const name = formData.name;
+        const firstName = formData.firstName;
+        const lastName = formData.lastName;
         const email = formData.email;
         const response = await axios.post(
           "http://localhost:5000/api/register",
           {
-            name,
+            firstName,
+            lastName,
             email,
             password,
           }
@@ -45,7 +51,6 @@ const RegisterScreen = (props) => {
         const data = response.data;
         toast.success(data.message);
         setNewStage(true);
-        console.log(data.activationLink);
       } catch (error) {
         toast.error(error.response.data.error);
         setLoading(false);
@@ -64,15 +69,23 @@ const RegisterScreen = (props) => {
         <li>
           <h2>Create Account</h2>
         </li>
-        <li>{loading ? <div>Loading .....</div> : null}</li>
+        <li>{loading ? <LoadingIndicator /> : null}</li>
         <li>
-          <label htmlFor="name">Name</label>
+          <label htmlFor="firstName">First Name</label>
           <input
             type="text"
-            placeholder="Your Name"
-            id="name"
-            onChange={handleChange("name")}
-            value={name}
+            id="firstname"
+            onChange={handleChange("firstName")}
+            value={firstName}
+          />
+        </li>
+        <li>
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastname"
+            onChange={handleChange("lastName")}
+            value={lastName}
           />
         </li>
         <li>
@@ -80,7 +93,6 @@ const RegisterScreen = (props) => {
           <input
             type="email"
             name="email"
-            placeholder="Your Email"
             id="email"
             value={email}
             onChange={handleChange("email")}
@@ -91,7 +103,6 @@ const RegisterScreen = (props) => {
           <input
             type="password"
             id="password"
-            placeholder="Password"
             name="password"
             value={password}
             onChange={handleChange("password")}
@@ -102,7 +113,6 @@ const RegisterScreen = (props) => {
           <input
             type="password"
             id="rePassword"
-            placeholder="Confirm Password"
             name="rePassword"
             value={rePassword}
             onChange={handleChange("rePassword")}

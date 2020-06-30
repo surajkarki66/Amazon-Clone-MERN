@@ -17,6 +17,9 @@ import PlaceOrderScreen from './screens/PlaceOrderScreen';
 import OrdersScreen from './screens/OrdersScreen';
 import OrderScreen from './screens/OrderScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import ProfileUpdateScreen from './screens/UpdateProfileScreen';
+import ProfileUpdateScreenConfirm from './screens/UpdateProfileScreenConfirm';
+import ProductsScreen from './screens/ProductsScreen';
 
 function App() {
   const userSignin = useSelector(state => state.userSignin);
@@ -27,6 +30,12 @@ function App() {
   };
   const closeMenu = () => {
     document.querySelector(".sidebar").classList.remove("open");
+  }
+  let firstLink =  <Link to="/signin">Sign In</Link>
+  let secondLink = null;
+  if (userInfo) {
+    firstLink = <Link to="/profile">{userInfo.firstName} {userInfo.lastName}</Link>
+    secondLink = null;
   }
   return (
     <BrowserRouter>
@@ -40,29 +49,42 @@ function App() {
         <Link to="/">Amazon-Clone</Link>
       </div>
       <div className="header-links">
-        <a href="cart.html">Cart</a>
-        {
-              userInfo ? <Link to="/profile">{userInfo.name}</Link> :
-                <Link to="/signin">Sign In</Link>
-        }
+        {firstLink}
+        {secondLink}
+        {userInfo && userInfo.role === 'admin' && (
+              <div className="dropdown">
+                <a href="/"  >Admin</a>
+                <ul className="dropdown-content">
+                  <li>
+                    <Link to="/orders">Orders</Link>
+                    <Link to="/products">Products</Link>
+                  </li>
+                </ul>
+              </div>
+          )}
       </div>
     </header>
     <aside className="sidebar">
-      <h3>Shopping Categories</h3>
-      <button className="sidebar-close-button" onClick={closeMenu}>x</button>
-      <ul>
-        <li>
-          <a href="index.html">Pants</a>
-        </li>
+          <h3>Shopping Categories</h3>
+          <button className="sidebar-close-button" onClick={closeMenu}>x</button>
+          <ul className="categories">
+            <li>
+              <Link to="/category/ComputerComponent">Computer Component</Link>
+            </li>
 
-        <li>
-          <a href="index.html">Shirts</a>
-        </li>
+            <li>
+              <Link to="/category/Mobile">Mobile</Link>
+            </li>
 
-      </ul>
-    </aside>
+            <li>
+              <Link to="/category/Fashion">Fashion</Link>
+            </li>
+
+          </ul>
+        </aside>
     <main className="main">
       <div className="content">
+      
       <Route path="/product/:id" component={ProductScreen} />
       <Route path="/cart/:id?" component={CartScreen} />
       <Route path="/signin" component={SignInScreen} />
@@ -71,10 +93,16 @@ function App() {
       <Route path="/shipping" component={ShippingScreen} />
       <Route path="/payment" component={PaymentScreen} />
       <Route path="/placeorder" component={PlaceOrderScreen} /> 
-      <Route path="/" exact={true} component={HomeScreen} />
+      <Route path="/products" component={ProductsScreen} />
       <Route path="/orders" component={OrdersScreen} />
       <Route path="/order/:id" component={OrderScreen} />
       <Route path="/profile" component={ProfileScreen} />
+      <Route path="/user/update" component={ProfileUpdateScreen} />
+      <Route path="/update/confirm/:token" component={ProfileUpdateScreenConfirm} />
+      <Route path="/category/:category" component={HomeScreen} />
+      <Route path="/" exact={true} component={HomeScreen} />
+     
+      
 
       </div>
 

@@ -2,9 +2,8 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Cookie } from 'js-cookie';
 
-
+import LoadingIndicator from '../components/UI/LoadingIndicator';
 import CheckoutSteps from '../components/CheckoutSteps';
 import { createOrder } from '../actions/orderActions';
 
@@ -12,7 +11,7 @@ const PlaceOrderScreen = (props) => {
 
   const cart = useSelector(state => state.cart);
   const orderCreate = useSelector(state => state.orderCreate);
-  const { success, error, order } = orderCreate;
+  const { success, loading, error, order } = orderCreate;
 
   const { cartItems, shipping, payment } = cart;
  
@@ -46,6 +45,7 @@ const dispatch = useDispatch();
   }, [success, props.history, error, payment, shipping, ]);
 
   return <div>
+    {loading ? <h1 style={{textAlign:'center'}}><LoadingIndicator /></h1> : null }
     <CheckoutSteps step1 step2 step3 step4 ></CheckoutSteps>
     <div className="placeorder">
       <div className="placeorder-info">
@@ -83,7 +83,7 @@ const dispatch = useDispatch();
                 cartItems.map(item =>
                   <li key={item.product}>
                     <div className="cart-image">
-                      <img src={item.image} alt="product" />
+                      <img src={"http://localhost:5000/" + item.image} alt="product" />
                     </div>
                     <div className="cart-name">
                       <div>

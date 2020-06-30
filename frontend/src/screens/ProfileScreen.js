@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
 
-import { logout, update } from "../actions/userActions";
+import LoadingIndicator from '../components/UI/LoadingIndicator';
+import { logout } from "../actions/userActions";
 import { listMyOrders } from "../actions/orderActions";
 
 const ProfileScreen = (props) => {
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const dispatch = useDispatch();
 
@@ -18,117 +18,77 @@ const ProfileScreen = (props) => {
     dispatch(logout());
     props.history.push("/");
   };
-  const submitHandler = (e) => {
-    e.preventDefault();
-    dispatch(update({ userId: userInfo._id, email, name, password }));
-  };
-  const userUpdate = useSelector((state) => state.profileUpdate);
-  const { loading, data, error } = userUpdate;
+
   const myOrderList = useSelector((state) => state.myOrderList);
   const { loading: loadingOrders, orders, error: errorOrders } = myOrderList;
+  let allOrders = null;
   useEffect(() => {
     if (userInfo) {
       setEmail(userInfo.email);
-      setName(userInfo.name);
+      setFirstName(userInfo.firstName);
+      setLastName(userInfo.lastName);
     }
-    if (error) {
-      toast.error(error.response.data.message);
-    }
-    if (data) {
-      toast.success(data.message);
-    }
-
+    
     dispatch(listMyOrders());
     return () => {};
-  }, [userInfo, data, error, dispatch]);
+  }, [userInfo, dispatch]);
+
+  if (loadingOrders) {
+    allOrders = <h1 style={{textAlign: 'center'}}><LoadingIndicator /></h1>;
+  }
+  if (errorOrders) {
+    allOrders = <div>{errorOrders}</div>;
+  }
+  if (!loadingOrders) {
+    allOrders = (
+      <React.Fragment>
+        <h2 style={{ textAlign: "center" }}>My Orders</h2>
+        <table className="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>DATE</th>
+              <th>TOTAL</th>
+              <th>PAID</th>
+              <th>ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order._id}>
+                <td>{order._id}</td>
+                <td>{order.createdAt}</td>
+                <td>{order.totalPrice}</td>
+                <td>{order.isPaid}</td>
+                <td>
+                  <Link to={"/order/" + order._id}>DETAILS</Link>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </React.Fragment>
+    );
+    
+  }
 
   return (
     <div className="profile">
-      <div className="profile-info">
-        <div className="form">
-          <form onSubmit={submitHandler}>
-            <ul className="form-container">
-              <li>
-                <h2 style={{ textAlign: "center" }}>Update User Profile</h2>
-              </li>
-              <li>{loading && <div>Loading...</div>}</li>
-              <li>
-                <label htmlFor="name">Name</label>
-                <input
-                  type="name"
-                  name="name"
-                  id="name"
-                  onChange={(e) => setName(e.target.value)}
-                ></input>
-              </li>
-              <li>
-                <label htmlFor="email">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  id="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                ></input>
-              </li>
-              <li>
-                <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  name="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                ></input>
-              </li>
-
-              <li>
-                <button type="submit" className="button primary">
-                  Update
-                </button>
-              </li>
-            </ul>
-          </form>
-        </div>
-      </div>
       <div className="profile-orders content-margined">
-        <h2 style={{ textAlign: "center" }}>My Orders</h2>
-        {loadingOrders ? (
-          <div>Loading...</div>
-        ) : errorOrders ? (
-          <div>{errorOrders} </div>
-        ) : (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>DATE</th>
-                <th>TOTAL</th>
-                <th>PAID</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td>{order._id}</td>
-                  <td>{order.createdAt}</td>
-                  <td>{order.totalPrice}</td>
-                  <td>{order.isPaid}</td>
-                  <td>
-                    <Link to={"/order/" + order._id}>DETAILS</Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-
-        <ul className="form-container">
+        <ul className="form-container" style={{ marginLeft: "470px" }}>
           <h2 style={{ textAlign: "center" }}>Profile</h2>
           <label
             htmlFor="name"
             style={{ fontSize: "2rem", fontWeight: "bold" }}
           >
-            Name: {name}{" "}
+            First Name: {firstName}{" "}
+          </label>
+          <br />
+          <label
+            htmlFor="name"
+            style={{ fontSize: "2rem", fontWeight: "bold" }}
+          >
+            Last Name: {lastName}{" "}
           </label>
           <br />
           <label
@@ -137,6 +97,14 @@ const ProfileScreen = (props) => {
           >
             Email: {email}{" "}
           </label>
+
+          {userInfo.isActive ? (
+            <h3>Account Activated</h3>
+          ) : (
+            <Link to="/">
+              <h3>Activate your account.</h3>
+            </Link>
+          )}
 
           <li>
             <button
@@ -147,7 +115,12 @@ const ProfileScreen = (props) => {
               Logout
             </button>
           </li>
+          <li>
+            <Link to="/user/update/">Update Profile</Link>
+          </li>
         </ul>
+
+        {allOrders}
       </div>
     </div>
   );

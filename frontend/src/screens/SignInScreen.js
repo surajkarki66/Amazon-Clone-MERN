@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 
 import {signin} from '../actions/userActions';
+import LoadingIndicator from '../components/UI/LoadingIndicator';
 
 const SignInScreen = (props) => {
     const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ const SignInScreen = (props) => {
           <h2>Sign-In</h2>
         </li>
         <li>
-          {loading && <div>Loading...</div>}
+          {loading && <h1 style={{textAlign:'center'}}><LoadingIndicator /></h1>}
         </li>
         <li>
           <label htmlFor="email">

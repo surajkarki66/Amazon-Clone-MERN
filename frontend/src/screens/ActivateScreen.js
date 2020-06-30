@@ -4,9 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { activation } from "../actions/userActions";
 
+import LoadingIndicator from '../components/UI/LoadingIndicator';
+
 const Activate = (props) => {
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     token: "",
     show: true,
   });
@@ -16,20 +19,21 @@ const Activate = (props) => {
 
   useEffect(() => {
     let token = props.match.params.token;
-    let { name } = jwt.decode(token);
+    let { firstName, lastName } = jwt.decode(token);
     if (token) {
-      setFormData({ ...formData, name, token });
+      setFormData({ ...formData, firstName, lastName, token });
     }
     // eslint-disable-next-line
   }, []);
-  const { name, token } = formData;
+  const { firstName, lastName, token } = formData;
 
   const handleSubmit = (e) => {
     e.preventDefault();
     dispatch(activation(token));
     setFormData({
       ...formData,
-      name: "",
+      firstName: "",
+      lastName: "",
       token: ""
     });
   };
@@ -40,10 +44,10 @@ const Activate = (props) => {
       <form onSubmit={handleSubmit}>
         <ul className="form-container">
           <li>
-            <h2 style={{ textAlign: "center" }}>Welcome {name}</h2>
+            <h2 style={{ textAlign: "center" }}>Welcome {firstName} {lastName}</h2>
             <h3 style={{ textAlign: "center" }}>Activate Your Account...</h3>
           </li>
-          <li>{loading && <div>Loading...</div>}</li>
+          <li>{loading && <h1 style={{textAlign:'center'}}><LoadingIndicator /></h1>}</li>
 
           <li>
             <button type="submit" className="button primary">

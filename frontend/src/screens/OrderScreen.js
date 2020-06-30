@@ -7,8 +7,7 @@ const OrderScreen = (props) => {
   const orderPay = useSelector((state) => state.orderPay);
   const {
     loading: loadingPay,
-    success: successPay,
-    error: errorPay,
+    success: successPay
   } = orderPay;
   const dispatch = useDispatch();
   useEffect(() => {
@@ -64,7 +63,7 @@ const OrderScreen = (props) => {
                 order.orderItems.map((item) => (
                   <li key={item._id}>
                     <div className="cart-image">
-                      <img src={item.image} alt="product" />
+                      <img src={"http://localhost:5000/" + item.image} alt="product" />
                     </div>
                     <div className="cart-name">
                       <div>
