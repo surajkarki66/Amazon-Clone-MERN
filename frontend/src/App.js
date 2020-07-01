@@ -69,15 +69,15 @@ function App() {
           <button className="sidebar-close-button" onClick={closeMenu}>x</button>
           <ul className="categories">
             <li>
-              <Link to="/category/ComputerComponent">Computer Component</Link>
+              <Link to="/category/computer">Computer</Link>
             </li>
 
             <li>
-              <Link to="/category/Mobile">Mobile</Link>
+              <Link to="/category/mobile">Mobile</Link>
             </li>
 
             <li>
-              <Link to="/category/Fashion">Fashion</Link>
+              <Link to="/category/fashion">Fashion</Link>
             </li>
 
           </ul>
