@@ -11,7 +11,7 @@ import {
   mineOrderController,
   deleteOrderController,
   orderDetailController,
-} from "../controllers/orders/orders.controller";
+} from "../controllers/orders.controller";
 
 // Routes
 router.post("/", isAuth, createOrderController);

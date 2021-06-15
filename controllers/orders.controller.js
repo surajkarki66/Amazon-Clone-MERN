@@ -1,4 +1,4 @@
-import Order from "../../models/order.model";
+import Order from "../models/order.model";
 
 const createOrderController = async (req, res) => {
   try {
@@ -55,9 +55,9 @@ const deleteOrderController = async (req, res) => {
 };
 
 export {
-    createOrderController,
-    listOrderController,
-    mineOrderController,
-    orderDetailController,
-    deleteOrderController
+  createOrderController,
+  listOrderController,
+  mineOrderController,
+  orderDetailController,
+  deleteOrderController,
 };

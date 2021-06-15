@@ -1,10 +1,5 @@
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 
-// Config .env to ./config/config.env
-dotenv.config({
-  path: "./configs/configs.env",
-});
 const getToken = (user) => {
   return jwt.sign(
     {

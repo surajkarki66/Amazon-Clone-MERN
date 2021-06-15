@@ -1,6 +1,6 @@
 import express from "express";
 
-import upload from '../middlewares/upload';
+import upload from "../middlewares/upload";
 const router = express.Router();
 
 import { isAuth, isAdmin } from "../middlewares/utils";
@@ -11,7 +11,7 @@ import {
   productDetailController,
   updateProductController,
   deleteProductController,
-} from "../controllers/products/products.controller";
+} from "../controllers/products.controller";
 
 // Routes
 router.get("/", productListController);

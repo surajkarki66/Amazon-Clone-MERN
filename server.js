@@ -4,14 +4,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 
 import connectDb from "./configs/db";
-import authRouter from './routes/auth.route';
-import productRouter from './routes/product.route';
-import orderRouter from './routes/order.route';
+import authRouter from "./routes/auth.route";
+import productRouter from "./routes/product.route";
+import orderRouter from "./routes/order.route";
 
 // Config .env to ./config/config.env
-dotenv.config({
-  path: "./configs/configs.env",
-});
+dotenv.config();
 
 // Connect to database.
 connectDb();
@@ -22,7 +20,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 
 app.use(
   cors({
@@ -33,9 +31,9 @@ app.use(
 app.use(morgan("dev"));
 
 // Use routes
-app.use('/api/', authRouter);
-app.use('/api/products', productRouter);
-app.use('/api/orders', orderRouter);
+app.use("/api/", authRouter);
+app.use("/api/products", productRouter);
+app.use("/api/orders", orderRouter);
 
 const PORT = process.env.PORT;
 

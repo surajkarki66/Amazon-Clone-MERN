@@ -1,21 +1,16 @@
 import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-
-dotenv.config({
-  path: "./configs/configs.env",
-});
 
 // create reusable transporter object using the default SMTP transport
 const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
+  host: "smtp.ethereal.email",
   port: 587,
   auth: {
-      user: process.env.EMAIL,
-      pass: process.env.PASSWORD
-  }
+    user: process.env.EMAIL,
+    pass: process.env.PASSWORD,
+  },
 });
- //Verifying the Nodemailer Transport instance
- transporter.verify((error, success) => {
+//Verifying the Nodemailer Transport instance
+transporter.verify((error, success) => {
   if (error) {
     console.log(error);
   } else {

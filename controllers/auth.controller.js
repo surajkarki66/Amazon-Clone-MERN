@@ -2,16 +2,13 @@ import { validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import mailgun from "mailgun-js";
 import dotenv from "dotenv";
-import _ from "lodash";
 import expressJwt from "express-jwt";
 
-import User from "../../models/user.model";
-import { getToken } from "../../middlewares/utils";
-dotenv.config({
-  path: "./configs/configs.env",
-});
+import User from "../models/user.model";
+import { getToken } from "../middlewares/utils";
 
-const { errorHandler } = require("../../helpers/dbErrorHandling");
+const { errorHandler } = require("../helpers/dbErrorHandling");
+dotenv.config();
 
 const registerController = (req, res) => {
   const { firstName, lastName, email, password } = req.body;
@@ -71,7 +68,6 @@ const registerController = (req, res) => {
                               <p>${process.env.CLIENT_URL}</p>
                               `,
               };
-              console.log(token);
               mg.messages().send(data, (error, body) => {
                 if (body) {
                   res.status(200).json({
@@ -204,6 +200,7 @@ const signinController = (req, res) => {
 
 const requireSignin = expressJwt({
   secret: process.env.JWT_SECRET,
+  algorithms: ["HS256"],
 });
 
 const forgetPasswordController = (req, res) => {
@@ -307,55 +304,56 @@ const resetPasswordController = (req, res) => {
     });
   } else {
     if (resetPasswordLink) {
-      jwt.verify(resetPasswordLink, process.env.JWT_RESET_PASSWORD, function (
-        err,
-        decoded
-      ) {
-        if (err) {
-          return res.status(400).json({
-            error: "Expired link. Try again",
-          });
-        }
-
-        if (decoded) {
-          User.findOne({
-            resetPasswordLink,
-          })
-            .then((user) => {
-              if (!user) {
-                return res.status(404).json({
-                  error: "Something went wrong. Try later",
-                });
-              }
-              if (user) {
-                const updatedFields = {
-                  password: newPassword,
-                  resetPasswordLink: "",
-                };
-                user = _.extend(user, updatedFields);
-                user
-                  .save()
-                  .then((result) => {
-                    if (result) {
-                      return res.status(200).json({
-                        message: `Great! Now you can login with your new password`,
-                      });
-                    }
-                  })
-                  .catch((error) => {
-                    return res.json({
-                      error: errorHandler(error),
-                    });
-                  });
-              }
-            })
-            .catch((error) => {
-              return res.json({
-                error: errorHandler(error),
-              });
+      jwt.verify(
+        resetPasswordLink,
+        process.env.JWT_RESET_PASSWORD,
+        function (err, decoded) {
+          if (err) {
+            return res.status(400).json({
+              error: "Expired link. Try again",
             });
+          }
+
+          if (decoded) {
+            User.findOne({
+              resetPasswordLink,
+            })
+              .then((user) => {
+                if (!user) {
+                  return res.status(404).json({
+                    error: "Something went wrong. Try later",
+                  });
+                }
+                if (user) {
+                  const updatedFields = {
+                    password: newPassword,
+                    resetPasswordLink: "",
+                  };
+                  user = _.extend(user, updatedFields);
+                  user
+                    .save()
+                    .then((result) => {
+                      if (result) {
+                        return res.status(200).json({
+                          message: `Great! Now you can login with your new password`,
+                        });
+                      }
+                    })
+                    .catch((error) => {
+                      return res.json({
+                        error: errorHandler(error),
+                      });
+                    });
+                }
+              })
+              .catch((error) => {
+                return res.json({
+                  error: errorHandler(error),
+                });
+              });
+          }
         }
-      });
+      );
     }
   }
 };
@@ -477,9 +475,8 @@ const profileUpdationConfirmController = (req, res) => {
           error: "Token is expired.",
         });
       } else {
-        const { userId, firstName, lastName, email, password } = jwt.decode(
-          token
-        );
+        const { userId, firstName, lastName, email, password } =
+          jwt.decode(token);
         User.findById(userId)
           .then((user) => {
             user.firstName = firstName;

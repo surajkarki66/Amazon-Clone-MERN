@@ -1,6 +1,6 @@
-import multer from 'multer';
+import multer from "multer";
 
-import Product from "../../models/product.model";
+import Product from "../models/product.model";
 
 const createProductController = async (req, res) => {
   const product = new Product({
@@ -42,7 +42,7 @@ const productListController = async (req, res) => {
   const products = await Product.find({ ...category, ...searchKeyword }).sort(
     sortOrder
   );
-  res.status(200).json(products);
+  return res.status(200).json(products);
 };
 
 const productDetailController = async (req, res) => {

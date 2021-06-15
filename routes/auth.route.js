@@ -10,9 +10,8 @@ import {
   resetPasswordController,
   facebookController,
   profileChangeController,
-  profileUpdationConfirmController
-} from '../controllers/auth/auth.controller';
-
+  profileUpdationConfirmController,
+} from "../controllers/auth.controller";
 
 // Load validator
 const {
@@ -28,8 +27,7 @@ router.patch("/activation", activationController);
 router.post("/signin", validSignIn, signinController);
 router.post("/forget", forgotPasswordValidator, forgetPasswordController);
 router.put("/reset", resetPasswordValidator, resetPasswordController);
-router.post('/user/:id', profileChangeController);
-router.put('/profile/confirm', profileUpdationConfirmController);
-
+router.post("/user/:id", profileChangeController);
+router.put("/profile/confirm", profileUpdationConfirmController);
 
 export default router;
